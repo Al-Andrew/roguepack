@@ -23,3 +23,7 @@ target('sandbox')
     set_kind('binary')
     add_files('sandbox/*.cpp')
     add_deps('roguepack')
+
+    after_build(function (target)
+        os.cp("$(projectdir)/sandbox/assets", "$(buildir)/$(os)/$(arch)/$(mode)/sandbox/")
+    end)
