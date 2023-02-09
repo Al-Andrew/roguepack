@@ -20,10 +20,25 @@ static constexpr i32 WINDOW_HEIGHT = 900;
 static constexpr Vector2 GRID_CELL_SIZE{90.f, 90.f};
 static constexpr f32 ROUND_TIME_MAX = 3.0f;
 
+class CanTakeTurn {
+public:
+    template<typename T>
+    CanTakeTurn(const T& canTakeTurn)
+        : object(&canTakeTurn),
+          speed_impl([](const void* obj){ return static_cast<const T*>(obj)->speed; }) {}
+
+    f32 speed() const {
+        return speed_impl(object);
+    }
+private:
+    const void* object;
+    f32 (*speed_impl)(const void*);
+};
 
 class Player {
 public:
     Vector2 position = { 0, 0 };
+    f32 speed = 5;
 
     static Player& the() {
         return instance;
@@ -133,6 +148,7 @@ void Update(f32 delta_time, PlayerAction action) {
 int main(int argc, char *argv[]) {
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "roguepack");
     SetTargetFPS(60);
+    TraceLog(LOG_INFO, "Player speed: %f", CanTakeTurn(Player::the()).speed());
     
     while (!WindowShouldClose()) {
         BeginDrawing();
